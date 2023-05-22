@@ -220,28 +220,28 @@ class MyLib(Library):
         print('\n')
         this.Menu()
 
-    def displayOpration(this, **inputs):
+    def displayOpration(this, inputs):
         listOfInputs = []
-        if inputs['status']:
+        if "status" in inputs:
             status = this.setInput(
                 'Enter the status of the book. (0/1) : ', 'bool')
             listOfInputs.append(status)
-        if ageGroup in inputs:
+        if "ageGroup" in inputs:
             ageGroup = this.setInput(
                 'Enter the age group of the book (number) : ', 'int')
             listOfInputs.append(ageGroup)
-        if author in inputs:
+        if "author" in inputs:
             author = this.setInput('Enter the author of the book : ', 'str')
             listOfInputs.append(author)
-        if name in inputs:
+        if "name" in inputs:
             name = this.setInput('Enter the name of the book : ', 'str')
             listOfInputs.append(name)
 
-        if ISBN in inputs:
+        if "ISBN" in inputs:
             ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
             listOfInputs.append(ISBN)
 
-        if userAge in inputs:
+        if "userAge" in inputs:
             userAge = this.setInput('Enter your age : ', 'int')
             listOfInputs.append(userAge)
         return listOfInputs
@@ -264,7 +264,9 @@ class MyLib(Library):
         except:
             this.Menu()
         if opration == 1:
-            this.displayRegBook()
+            print(this.displayOpration(
+                ["status", "ageGroup", "author", "name", "ISBN"]))
+            # this.displayRegBook()
         elif opration == 2:
             this.displayDelBook()
         elif opration == 3:
