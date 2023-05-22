@@ -10,11 +10,17 @@ class Library:
         this.books = books
         this.bookHolders = []
 
-    def RegBook(this, status, ageGroup, author, name, ISBN):
+    def findBookByISBN(this, ISBN):
         for book in this.books.keys():
             if this.books[book]['ISBN'] == ISBN:
-                print('This book is already registerd.')
-                return
+                return book
+
+    def RegBook(this, status, ageGroup, author, name, ISBN):
+        foundBook = this.findBookByISBN(ISBN)
+        if foundBook != None:
+            print('This book is already registerd.')
+            return
+
         title = 'Book ' + str(this.books.__len__() + 1)
         book = {
             title: {
@@ -25,14 +31,11 @@ class Library:
                 "ISBN": ISBN
             }}
         registerdBook = this.books.update(book)
-        print(book[title]["name"] + ' ' + 'was registerd.')
+        print(book[title]["name"] + ' was registerd.')
         return registerdBook
 
     def DelBook(this, ISBN):
-        foundBook = None
-        for book in this.books.keys():
-            if this.books[book]['ISBN'] == ISBN:
-                foundBook = book
+        foundBook = this.findBookByISBN(ISBN)
         if foundBook == None:
             print('This book is not registerd.')
         else:
@@ -80,6 +83,8 @@ class Library:
         for book in this.books.keys():
             if this.books[book]['ageGroup'] not in ageGroupList:
                 ageGroupList.append(this.books[book]['ageGroup'])
+                print(this.books[book]['ageGroup'])
+
                 points.append(this.filter(
                     this.books[book]['ageGroup']).__len__())
         x = numpy.array(ageGroupList, dtype=str)
@@ -133,6 +138,29 @@ class MyLib(Library):
                         print("You can't reserve this book.")
                 else:
                     print('This book is already reserved.')
+
+    def setInput(this, inputText, inputType):
+        value = ''
+        if inputType == 'int':
+            try:
+                value = int(input(inputText))
+            except:
+                return this.setInput(inputText, inputType)
+        elif inputType == 'str':
+            try:
+                value = input(inputText)
+            except:
+                return this.setInput(inputText, inputType)
+        elif inputType == 'bool':
+            try:
+                value = int(input(inputText))
+                if value == 0 or value == 1:
+                    return value
+                else:
+                    return this.setInput(inputText, inputType)
+            except:
+                return this.setInput(inputText, inputType)
+        return value
 
     def displayRegBook(this):
         status = this.setInput(
@@ -218,46 +246,23 @@ class MyLib(Library):
             listOfInputs.append(userAge)
         return listOfInputs
 
-    def setInput(this, inputText, inputType):
-        value = ''
-        if inputType == 'int':
-            try:
-                value = int(input(inputText))
-            except:
-                value = this.setInput(inputText, inputType)
-        elif inputType == 'str':
-            try:
-                value = input(inputText)
-            except:
-                value = this.setInput(inputText, inputType)
-        elif inputType == 'bool':
-            try:
-                value = int(input(inputText))
-                if value == 0 or value == 1:
-                    return value
-                else:
-                    return this.setInput(inputText, inputType)
-            except:
-                value = this.setInput(inputText, inputType)
-        return value
-
     def Menu(this):
-        print('List of oprations :')
-        print('1. Register a new book')
-        print('2. Delete an existing book')
-        print('3. List all of the books')
-        print('4. Search and find a book')
-        print('5. Reserve a book')
-        print('6. Return a reserved book')
-        print('7. Report')
-        print('8. Exit the application')
-
+        print('''
+        List of oprations :
+        1. Register a new book
+        2. Delete an existing book
+        3. List all of the books
+        4. Search and find a book
+        5. Reserve a book
+        6. Return a reserved book
+        7. Report
+        8. Exit the application
+        ''')
+        opration = ''
         try:
             opration = int(input('Choose what to happen : '))
         except:
-            print('\n')
-            print('You should Enter the number of opration you want to happen')
-            opration = int(input(' : '))
+            this.Menu()
         if opration == 1:
             this.displayRegBook()
         elif opration == 2:
@@ -279,7 +284,7 @@ class MyLib(Library):
             this.Menu()
 
 
-obj = MyLib(0, [], {
+books = {
     "Book 1": {
         "status": True,
         "ageGroup": 10,
@@ -322,6 +327,8 @@ obj = MyLib(0, [], {
         "name": "Kathy Wang",
         "ISBN": 69587
     }
-}, 0)
+}
+
+obj = MyLib(0, [], books,  0)
 
 obj.Menu()
