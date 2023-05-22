@@ -10,13 +10,16 @@ class Library:
         this.books = books
         this.bookHolders = []
 
-    def findBookByISBN(this, ISBN):
+    def findBook(this, key, value):
         for book in this.books.keys():
-            if this.books[book]['ISBN'] == ISBN:
+            if this.books[book][key] == value:
                 return book
+            else:
+                print('Book was not found')
+                return None
 
     def RegBook(this, status, ageGroup, author, name, ISBN):
-        foundBook = this.findBookByISBN(ISBN)
+        foundBook = this.findBook('ISBN', ISBN)
         if foundBook != None:
             print('This book is already registerd.')
             return
@@ -35,7 +38,7 @@ class Library:
         return registerdBook
 
     def DelBook(this, ISBN):
-        foundBook = this.findBookByISBN(ISBN)
+        foundBook = this.findBook('ISBN', ISBN)
         if foundBook == None:
             print('This book is not registerd.')
         else:
@@ -47,7 +50,7 @@ class Library:
             print(book + ' : ')
             print(this.books[book])
 
-    def Reserve(this, name, ISBN):
+    def Reserve(this, username, ISBN):
         for book in this.books:
             if this.books[book]['ISBN'] == ISBN:
                 if this.books[book]['status'] == bool(1):
@@ -55,24 +58,28 @@ class Library:
                     # increase = lambda num : num + 1
                     def increase(num): return num + 1
                     this.resCount = increase(this.resCount)
-                    this.bookHolders.append(name)
+                    this.bookHolders.append(username)
                     this.books[book]["status"] = bool(0)
                 else:
                     print('This book is already reserved.')
 
-    def ReturnBook(this, name, ISBN):
-        for book in this.books:
-            if this.books[book]["ISBN"] == ISBN:
-                if this.books[book]["status"] == bool(0):
-                    if name in this.bookHolders:
-                        this.bookHolders.remove(name)
+    def ReturnBook(this, username, ISBN):
+        foundBook = this.findBook('ISBN', ISBN)
+        if foundBook == None:
+            print('Could not find this book')
+            return
+        else:
+            if this.books[foundBook]["ISBN"] == ISBN:
+                if this.books[foundBook]["status"] == bool(0):
+                    if username in this.bookHolders:
+                        this.bookHolders.remove(username)
                     else:
                         print('You did not reserve this book.')
                     this.reserved.remove(ISBN)
                     # decrease = lambda num : num - 1
                     def decrease(num): return num - 1
                     this.resCount = decrease(this.resCount)
-                    this.books[book]["status"] = bool(1)
+                    this.books[foundBook]["status"] = bool(1)
                     print('You returned this book')
                 else:
                     print('This book is not reserved.')
@@ -83,8 +90,6 @@ class Library:
         for book in this.books.keys():
             if this.books[book]['ageGroup'] not in ageGroupList:
                 ageGroupList.append(this.books[book]['ageGroup'])
-                print(this.books[book]['ageGroup'])
-
                 points.append(this.filter(
                     this.books[book]['ageGroup']).__len__())
         x = numpy.array(ageGroupList, dtype=str)
@@ -117,27 +122,31 @@ class MyLib(Library):
         this.userAge = userAge
 
     def AgeOk(this, userAge):
-        for book in this.books.keys():
-            if this.books[book]['ageGroup'] <= userAge:
-                return this.books[book]['ISBN']
-            else:
-                return False
+        foundBook = this.findBook('ageGroup', userAge)
+        if foundBook == None:
+            return False
+        else:
+            return this.books[foundBook]['ISBN']
 
-    def Reserve(this, name, ISBN, userAge):
-        for book in this.books:
-            if this.books[book]['ISBN'] == ISBN:
-                if this.books[book]['status'] == bool(1):
-                    if this.AgeOk(userAge) != False:
-                        this.reserved.append(ISBN)
-                        # increase = lambda num : num + 1
-                        def increase(num): return num + 1
-                        this.resCount = increase(this.resCount)
-                        this.bookHolders.append(name)
-                        this.books[book]["status"] = bool(0)
-                    else:
-                        print("You can't reserve this book.")
-                else:
-                    print('This book is already reserved.')
+    def Reserve(this, username, ISBN, userAge):
+        foundBook = this.findBook('ISBN', ISBN)
+        if foundBook == None:
+            print('Could not find the book.')
+        else:
+            if this.books[foundBook]['status'] == bool(1):
+                if this.AgeOk(userAge) == False:
+                    print("You can't reserve this book.")
+                    return
+                this.reserved.append(ISBN)
+                # increase = lambda num : num + 1
+                def increase(num): return num + 1
+                this.resCount = increase(this.resCount)
+                this.bookHolders.append(username)
+                this.books[foundBook]["status"] = bool(0)
+                print('You reserved this book.')
+            else:
+                print('This book is already reserved.')
+                return
 
     def setInput(this, inputText, inputType):
         value = ''
@@ -162,64 +171,6 @@ class MyLib(Library):
                 return this.setInput(inputText, inputType)
         return value
 
-    def displayRegBook(this):
-        status = this.setInput(
-            'Enter the status of the book. (0/1) : ', 'bool')
-
-        ageGroup = this.setInput(
-            'Enter the age group of the book (number) : ', 'int')
-
-        author = this.setInput('Enter the author of the book : ', 'str')
-
-        name = this.setInput('Enter the name of the book : ', 'str')
-
-        ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
-        # (status, ageGroup, author, name, ISBN) = this.displayOpration(
-        # [status, ageGroup, author, name, ISBN])
-        this.RegBook(status, ageGroup, author, name, ISBN)
-        this.Menu()
-
-    def displayDelBook(this):
-        ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
-        this.DelBook(ISBN)
-        print('\n')
-        this.Menu()
-
-    def displayList(this):
-        this.List()
-        print('\n')
-        this.Menu()
-
-    def displaySearch(this):
-        typeOfValue = this.setInput(
-            'Enter the type of value your looking for (name / author) : ', 'str')
-
-        keyword = this.setInput('Enter the value : ', 'str')
-
-        this.Search(typeOfValue, keyword)
-        print('\n')
-        this.Menu()
-
-    def displayReserve(this):
-        userAge = this.setInput('Enter your age : ', 'int')
-        name = this.setInput('Enter your name : ', 'str')
-        ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
-        this.Reserve(name, ISBN, userAge)
-        print('\n')
-        this.Menu()
-
-    def displayReturnBook(this):
-        name = this.setInput('Enter your name : ', 'str')
-        ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
-        this.ReturnBook(name, ISBN)
-        print('\n')
-        this.Menu()
-
-    def displayReport(this):
-        this.Report()
-        print('\n')
-        this.Menu()
-
     def displayOpration(this, inputs):
         listOfInputs = []
         if "status" in inputs:
@@ -241,9 +192,22 @@ class MyLib(Library):
             ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
             listOfInputs.append(ISBN)
 
+        if 'username' in inputs:
+            username = this.setInput('Enter your name : ', 'str')
+            listOfInputs.append(username)
+
         if "userAge" in inputs:
             userAge = this.setInput('Enter your age : ', 'int')
             listOfInputs.append(userAge)
+
+        if "typeOfValue" in inputs:
+            typeOfValue = this.setInput(
+                'Enter the type of value your looking for (name / author) : ', 'str')
+            listOfInputs.append(typeOfValue)
+        if "keyword" in inputs:
+            keyword = this.setInput('Enter the value : ', 'str')
+            listOfInputs.append(keyword)
+
         return listOfInputs
 
     def Menu(this):
@@ -262,23 +226,41 @@ class MyLib(Library):
         try:
             opration = int(input('Choose what to happen : '))
         except:
-            this.Menu()
+            return this.Menu()
         if opration == 1:
-            print(this.displayOpration(
-                ["status", "ageGroup", "author", "name", "ISBN"]))
-            # this.displayRegBook()
+            status, ageGroup, author, name, ISBN = this.displayOpration(
+                ["status", "ageGroup", "author", "name", "ISBN"])
+            this.RegBook(status, ageGroup, author, name, ISBN)
+            print('\n')
+            return this.Menu()
         elif opration == 2:
-            this.displayDelBook()
+            ISBN = this.displayOpration(['ISBN'])
+            this.DelBook(ISBN[0])
+            print('\n')
+            return this.Menu()
         elif opration == 3:
-            this.displayList()
+            this.List()
+            print('\n')
+            return this.Menu()
         elif opration == 4:
-            this.displaySearch()
+            typeOfValue, keyword = this.displayOpration(
+                ['typeOfValue', 'keyword'])
+            this.Search(typeOfValue, keyword)
+            print('\n')
+            return this.Menu()
         elif opration == 5:
-            this.displayReserve()
+            ISBN, username, userAge = this.displayOpration(
+                ['ISBN', 'username', 'userAge'])
+            this.Reserve(username, ISBN, userAge)
+            print('\n')
+            return this.Menu()
         elif opration == 6:
-            this.displayReturnBook()
+            ISBN, username = this.displayOpration(['ISBN', 'username'])
+            this.ReturnBook(username, ISBN)
+            print('\n')
+            return this.Menu()
         elif opration == 7:
-            this.displayReport()
+            this.Report()
         elif opration == 8:
             return
         else:
