@@ -15,7 +15,6 @@ class Library:
             if this.books[book][key] == value:
                 return book
             else:
-                print('Book was not found')
                 return None
 
     def RegBook(this, status, ageGroup, author, name, ISBN):
@@ -51,11 +50,16 @@ class Library:
             print(this.books[book])
 
     def Reserve(this, username, ISBN):
-        for book in this.books:
-            if this.books[book]['ISBN'] == ISBN:
-                if this.books[book]['status'] == bool(1):
+        foundBook = this.findBook('ISBN', ISBN)
+        if foundBook == None:
+            print('Could not find the book.')
+            return
+        else:
+            if this.books[foundBook]['ISBN'] == ISBN:
+                if this.books[foundBook]['status'] == bool(1):
                     this.reserved.append(ISBN)
                     # increase = lambda num : num + 1
+                    # this.resCount = increase(this.resCount)
                     def increase(num): return num + 1
                     this.resCount = increase(this.resCount)
                     this.bookHolders.append(username)
@@ -77,12 +81,21 @@ class Library:
                         print('You did not reserve this book.')
                     this.reserved.remove(ISBN)
                     # decrease = lambda num : num - 1
+                    # this.resCount = decrease(this.resCount)
+
                     def decrease(num): return num - 1
                     this.resCount = decrease(this.resCount)
                     this.books[foundBook]["status"] = bool(1)
                     print('You returned this book')
                 else:
                     print('This book is not reserved.')
+
+    def filter(this, val):
+        group = []
+        for book in this.books.keys():
+            if this.books[book]['ageGroup'] == val:
+                group.append(val)
+        return group
 
     def Report(this):
         points = []
@@ -94,17 +107,12 @@ class Library:
                     this.books[book]['ageGroup']).__len__())
         x = numpy.array(ageGroupList, dtype=str)
         y = numpy.array(points)
+        colors = numpy.array([
+            'lime', 'skyblue', 'hotpink', 'teal', 'coral'])
         plot.xlabel('Age Group')
         plot.ylabel('Number of Books')
-        plot.bar(x, y, width=0.5, color='hotpink')
+        plot.bar(x, y, width=0.5, color=colors)
         plot.show()
-
-    def filter(this, val):
-        groups = []
-        for book in this.books.keys():
-            if this.books[book]['ageGroup'] == val:
-                groups.append(val)
-        return groups
 
     def Search(this, typeOfValue, keyword):
         for book in this.books.keys():
@@ -132,13 +140,17 @@ class MyLib(Library):
         foundBook = this.findBook('ISBN', ISBN)
         if foundBook == None:
             print('Could not find the book.')
+            return
         else:
             if this.books[foundBook]['status'] == bool(1):
                 if this.AgeOk(userAge) == False:
                     print("You can't reserve this book.")
                     return
                 this.reserved.append(ISBN)
+
                 # increase = lambda num : num + 1
+                # this.resCount = increase(this.resCount)
+
                 def increase(num): return num + 1
                 this.resCount = increase(this.resCount)
                 this.bookHolders.append(username)
