@@ -14,27 +14,25 @@ class Library:
         for book in this.books.keys():
             if this.books[book][key] == value:
                 return book
-            else:
-                return None
+
+        return None
 
     def RegBook(this, status, ageGroup, author, name, ISBN):
         foundBook = this.findBook('ISBN', ISBN)
-        if foundBook != None:
-            print('This book is already registerd.')
-            return
-
-        title = 'Book ' + str(this.books.__len__() + 1)
-        book = {
-            title: {
-                "status": bool(status),
-                "ageGroup": ageGroup,
-                "author": author,
-                "name": name,
-                "ISBN": ISBN
-            }}
-        registerdBook = this.books.update(book)
-        print(book[title]["name"] + ' was registerd.')
-        return registerdBook
+        if foundBook == None:
+            title = 'Book ' + str(this.books.__len__() + 1)
+            book = {
+                title: {
+                    "ISBN": ISBN,
+                    "name": name,
+                    "author": author,
+                    "ageGroup": ageGroup,
+                    "status": bool(status),
+                }}
+            registerdBook = this.books.update(book)
+            print(book[title]["name"] + ' was registerd.')
+            return registerdBook
+        print('This book is already registerd.')
 
     def DelBook(this, ISBN):
         foundBook = this.findBook('ISBN', ISBN)
@@ -90,7 +88,7 @@ class Library:
                 else:
                     print('This book is not reserved.')
 
-    def filter(this, val):
+    def filterAgeGroup(this, val):
         group = []
         for book in this.books.keys():
             if this.books[book]['ageGroup'] == val:
@@ -103,7 +101,7 @@ class Library:
         for book in this.books.keys():
             if this.books[book]['ageGroup'] not in ageGroupList:
                 ageGroupList.append(this.books[book]['ageGroup'])
-                points.append(this.filter(
+                points.append(this.filterAgeGroup(
                     this.books[book]['ageGroup']).__len__())
         x = numpy.array(ageGroupList, dtype=str)
         y = numpy.array(points)
@@ -115,7 +113,7 @@ class Library:
         plot.show()
 
     def Search(this, typeOfValue, keyword):
-        for book in this.books.keys():
+        for book in this.books:
             if this.books[book][typeOfValue].lower() == keyword.lower():
                 print('Found the book you wanted: ')
                 print(this.books[book]["ISBN"])
@@ -185,24 +183,26 @@ class MyLib(Library):
 
     def displayOpration(this, inputs):
         listOfInputs = []
-        if "status" in inputs:
-            status = this.setInput(
-                'Enter the status of the book. (0/1) : ', 'bool')
-            listOfInputs.append(status)
-        if "ageGroup" in inputs:
-            ageGroup = this.setInput(
-                'Enter the age group of the book (number) : ', 'int')
-            listOfInputs.append(ageGroup)
-        if "author" in inputs:
-            author = this.setInput('Enter the author of the book : ', 'str')
-            listOfInputs.append(author)
+        if "ISBN" in inputs:
+            ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
+            listOfInputs.append(ISBN)
+
         if "name" in inputs:
             name = this.setInput('Enter the name of the book : ', 'str')
             listOfInputs.append(name)
 
-        if "ISBN" in inputs:
-            ISBN = this.setInput('Enter the ISBN of the book : ', 'int')
-            listOfInputs.append(ISBN)
+        if "author" in inputs:
+            author = this.setInput('Enter the author of the book : ', 'str')
+            listOfInputs.append(author)
+
+        if "ageGroup" in inputs:
+            ageGroup = this.setInput(
+                'Enter the age group of the book (number) : ', 'int')
+            listOfInputs.append(ageGroup)
+        if "status" in inputs:
+            status = this.setInput(
+                'Enter the status of the book. (0/1) : ', 'bool')
+            listOfInputs.append(status)
 
         if 'username' in inputs:
             username = this.setInput('Enter your name : ', 'str')
@@ -216,6 +216,7 @@ class MyLib(Library):
             typeOfValue = this.setInput(
                 'Enter the type of value your looking for (name / author) : ', 'str')
             listOfInputs.append(typeOfValue)
+
         if "keyword" in inputs:
             keyword = this.setInput('Enter the value : ', 'str')
             listOfInputs.append(keyword)
@@ -240,8 +241,8 @@ class MyLib(Library):
         except:
             return this.Menu()
         if opration == 1:
-            status, ageGroup, author, name, ISBN = this.displayOpration(
-                ["status", "ageGroup", "author", "name", "ISBN"])
+            ISBN, name, author, ageGroup, status = this.displayOpration(
+                ["ISBN", "name", "author", "ageGroup", "status"])
             this.RegBook(status, ageGroup, author, name, ISBN)
             print('\n')
             return this.Menu()
@@ -289,39 +290,39 @@ books = {
         "ISBN": 12345
     },
     "Book 2": {
-        "status": True,
-        "ageGroup": 21,
-        "author": "Stephen R. Covey",
+        "ISBN": 56789,
         "name": "The 7 habbits of highly effective people",
-        "ISBN": 56789
+        "author": "Stephen R. Covey",
+        "ageGroup": 21,
+        "status": True
     },
     "Book 3": {
-        "status": True,
-        "ageGroup": 25,
-        "author": "Paulo Coelho",
+        "ISBN": 54789,
         "name": "The Alchemist",
-        "ISBN": 54789
+        "author": "Paulo Coelho",
+        "ageGroup": 25,
+        "status": True
     },
     "Book 4": {
-        "status": True,
-        "ageGroup": 31,
-        "author": "John Steinbeck",
+        "ISBN": 14523,
         "name": "The grapes of wrath",
-        "ISBN": 14523
+        "author": "John Steinbeck",
+        "ageGroup": 31,
+        "status": True
     },
     "Book 5": {
-        "status": True,
-        "ageGroup": 20,
-        "author": "Cheryl Strayed",
+        "ISBN": 78523,
         "name": "Wild",
-        "ISBN": 78523
+        "author": "Cheryl Strayed",
+        "ageGroup": 20,
+        "status": True
     },
     "Book 6": {
-        "status": True,
-        "ageGroup": 20,
-        "author": "Imposter syndrome",
+        "ISBN": 69587,
         "name": "Kathy Wang",
-        "ISBN": 69587
+        "author": "Imposter syndrome",
+        "ageGroup": 20,
+        "status": True
     }
 }
 
