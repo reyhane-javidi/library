@@ -17,7 +17,7 @@ class Library:
 
         return None
 
-    def RegBook(this, status, ageGroup, author, name, ISBN):
+    def RegBook(this, ageGroup, author, name, ISBN):
         foundBook = this.findBook('ISBN', ISBN)
         if foundBook == None:
             title = 'Book ' + str(this.books.__len__() + 1)
@@ -27,7 +27,7 @@ class Library:
                     "name": name,
                     "author": author,
                     "ageGroup": ageGroup,
-                    "status": bool(status),
+                    "status": True,
                 }}
             registerdBook = this.books.update(book)
             print(book[title]["name"] + ' was registerd.')
@@ -241,9 +241,9 @@ class MyLib(Library):
         except:
             return this.Menu()
         if opration == 1:
-            ISBN, name, author, ageGroup, status = this.displayOpration(
-                ["ISBN", "name", "author", "ageGroup", "status"])
-            this.RegBook(status, ageGroup, author, name, ISBN)
+            ISBN, name, author, ageGroup = this.displayOpration(
+                ["ISBN", "name", "author", "ageGroup"])
+            this.RegBook(ageGroup, author, name, ISBN)
             print('\n')
             return this.Menu()
         elif opration == 2:
