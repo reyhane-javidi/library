@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plot
 import numpy
-import re
 
 
 class Library:
